@@ -1,36 +1,49 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>画面ポップアップ検証</title>
+  <title>Webex Screen Pop</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
       padding: 2em;
-      background-color: #f4f4f4;
     }
     .container {
-      background: white;
-      padding: 1em;
+      background-color: #fff;
+      padding: 1.5em;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
     }
-    .caller-id {
-      font-size: 1.2em;
+    h2 {
       color: #333;
+    }
+    p {
+      font-size: 1.1em;
+      margin: 0.5em 0;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Webex Calling 画面ポップアップ検証</h2>
-    <p class="caller-id">発信者番号: <span id="callerid">取得中...</span></p>
+    <h2>Webex Calling 画面ポップアップ</h2>
+    <p><strong>ANI:</strong> <span id="ani">取得中...</span></p>
+    <p><strong>DNIS:</strong> <span id="dnis">取得中...</span></p>
+    <p><strong>Interaction ID:</strong> <span id="interaction">取得中...</span></p>
+    <p><strong>Agent Name:</strong> <span id="agent">取得中...</span></p>
+    <p><strong>Queue Name:</strong> <span id="queue">取得中...</span></p>
   </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const callerId = params.get("callerid") || "不明";
-    document.getElementById("callerid").textContent = callerId;
+    document.getElementById("ani").textContent = params.get("ani") || "不明";
+    document.getElementById("dnis").textContent = params.get("dnis") || "不明";
+    document.getElementById("interaction").textContent = params.get("interaction") || "不明";
+    document.getElementById("agent").textContent = params.get("agent") || "不明";
+    document.getElementById("queue").textContent = params.get("queue") || "不明";
   </script>
 </body>
 </html>
