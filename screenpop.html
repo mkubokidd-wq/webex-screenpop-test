@@ -1,42 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>Webex Screen Pop - 日本語ラベル＋コピー機能</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
-  .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-  h2 { color: #0078d4; margin-bottom: 20px; }
-  .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-  .label { font-weight: bold; }
-  .value { flex: 1; margin-left: 10px; }
-  button { background: #0078d4; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-  button:hover { background: #005fa3; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Webex Screen Pop</title>
+  <style>
+    :root{
+      --font-sans: "Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",
+                   Meiryo, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans CJK JP",
+                   "Noto Sans JP", sans-serif;
+      --bg:#f6f7fb; --card:#fff; --text:#0e1320; --muted:#55607a; --accent:#2f6fff;
+      --border:#dfe3ef; --header-grad-a:rgba(47,111,255,.10); --header-grad-b:rgba(79,255,221,.08);
+      --shadow:0 10px 30px rgba(12,20,38,.08); color-scheme: light;
+    }
+    :root[data-theme="dark"]{
+      --bg:#0b1020; --card:#141a2b; --text:#e8edf7; --muted:#b3beda; --accent:#4f8cff;
+      --border:#223055; --header-grad-a:rgba(79,140,255,.15); --header-grad-b:rgba(79,255,221,.08);
+      --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
+    }
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);transition:background .25s,color .25s}
+    .wrap{min-height:100%;display:grid;place-items:center;padding:24px}
+    .card{width:min(760px,100%);background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+    .card header{padding:18px 22px;background:linear-gradient(135deg,var(--header-grad-a),var(--header-grad-b));border-bottom:1px solid var(--border);font-weight:600}
+    .card .body{padding:18px 22px}
+    .row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(127,127,127,.18)}
+    :root[data-theme="dark"] .row{border-bottom:1px dashed rgba(255,255,255,.08)}
+    .row:last-child{border-bottom:none}
+    .label{width:16em;color:var(--muted)}
+    .value{font-feature-settings:"tnum" 1,"ss01" 1}
+    .icon{width:1.2em;text-align:center}
+    .copy{margin-left:auto;font-size:.9em;color:var(--accent);cursor:pointer;user-select:none}
+    .copy:hover{text-decoration:underline}
+    .theme-toggle{position:fixed;top:14px;right:14px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);box-shadow:var(--shadow);cursor:pointer;font:500 13px/1 var(--font-sans)}
+    .theme-toggle svg{width:16px;height:16px;display:block}
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+  </style>
 </head>
 <body>
-<div class="container">
-  <h2>Webex Calling 画面ポップアップ</h2>
-  <div class="row"><span class="label">発信元電話番号（ANI）:</span><span class="value" id="ani">取得中...</span><button onclick="copyText('ani')">コピー</button></div>
-  <div class="row"><span class="label">着信先電話番号（DNIS）:</span><span class="value" id="dnis">取得中...</span><button onclick="copyText('dnis')">コピー</button></div>
-  <div class="row"><span class="label">通話ID（InteractionID）:</span><span class="value" id="interaction">取得中...</span><button onclick="copyText('interaction')">コピー</button></div>
-  <div class="row"><span class="label">エージェント名:</span><span class="value" id="agent">取得中...</span><button onclick="copyText('agent')">コピー</button></div>
-  <div class="row"><span class="label">キュー名:</span><span class="value" id="queue">取得中...</span><button onclick="copyText('queue')">コピー</button></div>
-</div>
-<script>
-  const params = new URLSearchParams(location.search);
-  document.getElementById("ani").textContent = params.get("ani") || "不明";
-  document.getElementById("dnis").textContent = params.get("dnis") || "不明";
-  document.getElementById("interaction").textContent = params.get("interaction") || "不明";
-  document.getElementById("agent").textContent = params.get("agent") || "不明";
-  document.getElementById("queue").textContent = params.get("queue") || "不明";
+  <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false" title="テーマを切り替え">
+    <span aria-hidden="true" id="themeIcon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg></span>
+    <span id="themeLabel">テーマ</span>
+    <span class="visually-hidden" id="themeState">（ライト）</span>
+  </button>
 
-  function copyText(id) {
-    const text = document.getElementById(id).textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      alert('コピーしました: ' + text);
-    });
-  }
-</script>
+  <div class="wrap">
+    <section class="card" role="region" aria-labelledby="title">
+      <header id="title">コール情報</header>
+      <div class="body">
+        <div class="row"><div class="icon">📞</div><div class="label">発信元電話番号（ANI）</div><div class="value" id="ani">取得中…</div><div class="copy" onclick="copyText('ani')">コピー</div></div>
+        <div class="row"><div class="icon">☎️</div><div class="label">着信先電話番号（DNIS）</div><div class="value" id="dnis">取得中…</div><div class="copy" onclick="copyText('dnis')">コピー</div></div>
+        <div class="row"><div class="icon">🆔</div><div class="label">通話ID（InteractionID）</div><div class="value" id="iid">取得中…</div><div class="copy" onclick="copyText('iid')">コピー</div></div>
+        <div class="row"><div class="icon">👤</div><div class="label">エージェント名</div><div class="value" id="agent">取得中…</div><div class="copy" onclick="copyText('agent')">コピー</div></div>
+        <div class="row"><div class="icon">📂</div><div class="label">キュー名</div><div class="value" id="queue">取得中…</div><div class="copy" onclick="copyText('queue')">コピー</div></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function copyText(id){
+      const el=document.getElementById(id); if(!el) return;
+      const text=el.textContent||'';
+      (navigator.clipboard?.writeText(text) || Promise.reject())
+        .then(()=>{ const o=el.textContent; el.textContent='コピーしました'; setTimeout(()=> el.textContent=o, 900); })
+        .catch(()=>{ const s=window.getSelection(), r=document.createRange(); r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r); try{document.execCommand('copy');}catch(_){ } s.removeAllRanges(); });
+    }
+    (function(){
+      const KEY='theme', root=document.documentElement;
+      function refresh(t){ const d=t==='dark';
+        themeToggle.setAttribute('aria-pressed', String(d));
+        themeState.textContent=d?'（ダーク）':'（ライト）';
+        themeLabel.textContent=d?'ダーク':'ライト';
+        themeIcon.innerHTML=d
+          ?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zm10.48 14.32l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM12 4V1h-0v3h0zm0 19v-3h0v3h0zm8-11h3v0h-3v0zM1 12h3v0H1v0zm15.24-7.16l1.8-1.79 1.41 1.41-1.79 1.8-1.42-1.42zM4.84 17.24l-1.79 1.8 1.41 1.41 1.8-1.79-1.42-1.42zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>'
+          :'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>'; }
+      function apply(t){ root.setAttribute('data-theme', t); localStorage.setItem(KEY, t); refresh(t); }
+      const saved=localStorage.getItem(KEY);
+      const initial=saved?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      apply(initial);
+      themeToggle.addEventListener('click',()=>apply(root.getAttribute('data-theme')==='dark'?'light':'dark'));
+      const media=matchMedia('(prefers-color-scheme: dark)'); if(media && !saved){ media.addEventListener?.('change',e=>apply(e.matches?'dark':'light')); }
+    })();
+  </script>
 </body>
-</html>
