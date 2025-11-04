@@ -1,49 +1,42 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Webex Screen Pop</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      padding: 2em;
-    }
-    .container {
-      background-color: #fff;
-      padding: 1.5em;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 600px;
-      margin: auto;
-    }
-    h2 {
-      color: #333;
-    }
-    p {
-      font-size: 1.1em;
-      margin: 0.5em 0;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Webex Screen Pop - 日本語ラベル＋コピー機能</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+  .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+  h2 { color: #0078d4; margin-bottom: 20px; }
+  .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+  .label { font-weight: bold; }
+  .value { flex: 1; margin-left: 10px; }
+  button { background: #0078d4; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #005fa3; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>Webex Calling 画面ポップアップ</h2>
-    <p><strong>ANI:</strong> <span id="ani">取得中...</span></p>
-    <p><strong>DNIS:</strong> <span id="dnis">取得中...</span></p>
-    <p><strong>Interaction ID:</strong> <span id="interaction">取得中...</span></p>
-    <p><strong>Agent Name:</strong> <span id="agent">取得中...</span></p>
-    <p><strong>Queue Name:</strong> <span id="queue">取得中...</span></p>
-  </div>
+<div class="container">
+  <h2>Webex Calling 画面ポップアップ</h2>
+  <div class="row"><span class="label">発信元電話番号（ANI）:</span><span class="value" id="ani">取得中...</span><button onclick="copyText('ani')">コピー</button></div>
+  <div class="row"><span class="label">着信先電話番号（DNIS）:</span><span class="value" id="dnis">取得中...</span><button onclick="copyText('dnis')">コピー</button></div>
+  <div class="row"><span class="label">通話ID（InteractionID）:</span><span class="value" id="interaction">取得中...</span><button onclick="copyText('interaction')">コピー</button></div>
+  <div class="row"><span class="label">エージェント名:</span><span class="value" id="agent">取得中...</span><button onclick="copyText('agent')">コピー</button></div>
+  <div class="row"><span class="label">キュー名:</span><span class="value" id="queue">取得中...</span><button onclick="copyText('queue')">コピー</button></div>
+</div>
+<script>
+  const params = new URLSearchParams(location.search);
+  document.getElementById("ani").textContent = params.get("ani") || "不明";
+  document.getElementById("dnis").textContent = params.get("dnis") || "不明";
+  document.getElementById("interaction").textContent = params.get("interaction") || "不明";
+  document.getElementById("agent").textContent = params.get("agent") || "不明";
+  document.getElementById("queue").textContent = params.get("queue") || "不明";
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    document.getElementById("ani").textContent = params.get("ani") || "不明";
-    document.getElementById("dnis").textContent = params.get("dnis") || "不明";
-    document.getElementById("interaction").textContent = params.get("interaction") || "不明";
-    document.getElementById("agent").textContent = params.get("agent") || "不明";
-    document.getElementById("queue").textContent = params.get("queue") || "不明";
-  </script>
+  function copyText(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('コピーしました: ' + text);
+    });
+  }
+</script>
 </body>
 </html>
