@@ -48,11 +48,11 @@
     <section class="card" role="region" aria-labelledby="title">
       <header id="title">Webex Calling コール情報</header>
       <div class="body">
-        <div class="row"><div class="icon">📞</div><div class="label">発信元電話番号（ANI）</div><div class="value" id="ani">{{NewPhoneContact.ANI}}</div><div class="copy" onclick="copyText('ani')">コピー</div></div>
-        <div class="row"><div class="icon">☎️</div><div class="label">着信先電話番号（DNIS）</div><div class="value" id="dnis">{{NewPhoneContact.DNIS}}</div><div class="copy" onclick="copyText('dnis')">コピー</div></div>
-        <div class="row"><div class="icon">🆔</div><div class="label">通話ID（InteractionID）</div><div class="value" id="iid">{{NewPhoneContact.InteractionID}}</div><div class="copy" onclick="copyText('iid')">コピー</div></div>
-        <div class="row"><div class="icon">👤</div><div class="label">エージェント名</div><div class="value" id="agent">{{AgentAnswered.AgentName}}</div><div class="copy" onclick="copyText('agent')">コピー</div></div>
-        <div class="row"><div class="icon">📂</div><div class="label">キュー名</div><div class="value" id="queue">{{AgentAnswered.QueueName}}</div><div class="copy" onclick="copyText('queue')">コピー</div></div>
+        <div class="row"><div class="icon">📞</div><div class="label">発信元電話番号（ANI）</div><div class="value" id="ani"></div><div class="copy" onclick="copyText('ani')">コピー</div></div>
+        <div class="row"><div class="icon">☎️</div><div class="label">着信先電話番号（DNIS）</div><div class="value" id="dnis"></div><div class="copy" onclick="copyText('dnis')">コピー</div></div>
+        <div class="row"><div class="icon">🆔</div><div class="label">通話ID（InteractionID）</div><div class="value" id="iid"></div><div class="copy" onclick="copyText('iid')">コピー</div></div>
+        <div class="row"><div class="icon">👤</div><div class="label">エージェント名</div><div class="value" id="agent"></div><div class="copy" onclick="copyText('agent')">コピー</div></div>
+        <div class="row"><div class="icon">📂</div><div class="label">キュー名</div><div class="value" id="queue"></div><div class="copy" onclick="copyText('queue')">コピー</div></div>
       </div>
     </section>
   </div>
@@ -61,10 +61,27 @@
     function copyText(id){
       const el=document.getElementById(id); if(!el) return;
       const text=el.textContent||'';
-      (navigator.clipboard?.writeText(text) || Promise.reject())
-        .then(()=>{ const o=el.textContent; el.textContent='コピーしました'; setTimeout(()=> el.textContent=o, 900); })
-        .catch(()=>{ const s=window.getSelection(), r=document.createRange(); r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r); try{document.execCommand('copy');}catch(_){ } s.removeAllRanges(); });
+      navigator.clipboard.writeText(text).then(()=>{
+        const o=el.textContent; el.textContent='コピーしました'; setTimeout(()=> el.textContent=o, 900);
+      }).catch(()=>{
+        const s=window.getSelection(), r=document.createRange(); r.selectNodeContents(el);
+        s.removeAllRanges(); s.addRange(r); document.execCommand('copy'); s.removeAllRanges();
+      });
     }
+
+    function getQueryParam(name){
+      const params=new URLSearchParams(window.location.search);
+      return params.get(name)||'';
+    }
+
+    // クエリパラメータから値を取得して表示
+    document.getElementById('ani').textContent=getQueryParam('ani');
+    document.getElementById('dnis').textContent=getQueryParam('dnis');
+    document.getElementById('iid').textContent=getQueryParam('interaction');
+    document.getElementById('agent').textContent=getQueryParam('agent');
+    document.getElementById('queue').textContent=getQueryParam('queue');
+
+    // ダークモード切替機能
     (function(){
       const KEY='theme', root=document.documentElement;
       function refresh(t){ const d=t==='dark';
@@ -83,3 +100,4 @@
     })();
   </script>
 </body>
+</html>
